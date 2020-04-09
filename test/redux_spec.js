@@ -50,7 +50,7 @@ describe("redux", () => {
       return new Promise(resolve => resolve(url));
     });
     const store = storeHelper(rest);
-    return async (
+    return async(
       store.dispatch,
       cb => rest.actions.test(cb),
       rest.actions.test2
@@ -72,7 +72,7 @@ describe("redux", () => {
 
     function testAction() {
       return (dispatch, getState) => {
-        async (dispatch, rest.actions.test)
+        async(dispatch, rest.actions.test)
           .then(data => {
             expect(getState().test.data).to.eql(data);
             done();
@@ -85,13 +85,10 @@ describe("redux", () => {
 
   it("check custom middlewareParser", () => {
     const rest = reduxApi({
-        test: "/api/url"
-      })
+      test: "/api/url"
+    })
       .use("fetch", url => new Promise(resolve => resolve(url)))
-      .use("middlewareParser", ({
-        getState,
-        dispatch
-      }) => ({
+      .use("middlewareParser", ({ getState, dispatch }) => ({
         getState,
         dispatch
       }));
@@ -131,14 +128,19 @@ describe("redux", () => {
     }).use(
       "fetch",
       url =>
-      new Promise(resolve => {
-        setTimeout(() => resolve({
-          url
-        }), 100);
-      })
+        new Promise(resolve => {
+          setTimeout(
+            () =>
+              resolve({
+                url
+              }),
+            100
+          );
+        })
     );
 
-    const expectedAction = [{
+    const expectedAction = [
+      {
         type: "@@redux-api@test",
         syncing: true,
         request: {
@@ -174,7 +176,7 @@ describe("redux", () => {
     const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
     const store = createStoreWithMiddleware(reducer);
 
-    const next = after(2, function () {
+    const next = after(2, function() {
       store.dispatch(
         rest.actions.test.sync((err, data) => {
           expect(data).to.eql({
@@ -237,7 +239,7 @@ describe("redux", () => {
           loading: false,
           data: {},
           request: null,
-          sync: false,
+          sync: false
         }).to.eql(props);
         return true;
       }
@@ -378,7 +380,7 @@ describe("redux", () => {
       });
     });
   });
-  it("check result of dispatch", function () {
+  it("check result of dispatch", function() {
     const rest = reduxApi({
       test: "/api/url"
     }).use("fetch", url => {
@@ -393,7 +395,7 @@ describe("redux", () => {
       });
     });
   });
-  it("check all arguments for transformer", function () {
+  it("check all arguments for transformer", function() {
     const expectedArgs = [
       [void 0, void 0, void 0],
       [
@@ -445,7 +447,7 @@ describe("redux", () => {
       .then(() => expect(expectedArgs).to.eql(["none"]));
   });
 
-  it("multiple endpoints", function () {
+  it("multiple endpoints", function() {
     const fetch = url => Promise.resolve(url);
 
     const expectedData = [
@@ -454,25 +456,33 @@ describe("redux", () => {
     ];
     const actualData = [];
 
-    const rest1 = reduxApi({
-      test: {
-        url: "/test1",
-        transformer(data, prevData) {
-          actualData.push([data, prevData]);
-          return data ? {
-            data
-          } : {};
+    const rest1 = reduxApi(
+      {
+        test: {
+          url: "/test1",
+          transformer(data, prevData) {
+            actualData.push([data, prevData]);
+            return data
+              ? {
+                  data
+                }
+              : {};
+          }
         }
+      },
+      {
+        prefix: "r1"
       }
-    }, {
-      prefix: "r1"
-    }).use("fetch", fetch);
+    ).use("fetch", fetch);
 
-    const rest2 = reduxApi({
-      test: "/test2"
-    }, {
-      prefix: "r2"
-    }).use("fetch", fetch);
+    const rest2 = reduxApi(
+      {
+        test: "/test2"
+      },
+      {
+        prefix: "r2"
+      }
+    ).use("fetch", fetch);
 
     const reducer = combineReducers({
       r1: combineReducers(rest1.reducers),
@@ -607,9 +617,7 @@ describe("redux", () => {
     ];
     const receiveArgs = [];
 
-    function midleware({
-      getState
-    }) {
+    function midleware({ getState }) {
       return next => action => {
         const result = next(action);
         if (typeof action !== "function") {
@@ -641,7 +649,7 @@ describe("redux", () => {
       });
   });
 
-  it("check default cache options", function () {
+  it("check default cache options", function() {
     let requestCount = 0;
     const rest = reduxApi({
       test: {
@@ -654,10 +662,12 @@ describe("redux", () => {
     });
     const store = storeHelper(rest);
     return store
-      .dispatch(rest.actions.test({
-        id1: 1,
-        id2: 2
-      }))
+      .dispatch(
+        rest.actions.test({
+          id1: 1,
+          id2: 2
+        })
+      )
       .then(() => {
         const state = store.getState();
         expect(state.test.cache).to.eql({
@@ -666,17 +676,19 @@ describe("redux", () => {
             expire: false
           }
         });
-        return store.dispatch(rest.actions.test({
-          id1: 1,
-          id2: 2
-        }));
+        return store.dispatch(
+          rest.actions.test({
+            id1: 1,
+            id2: 2
+          })
+        );
       })
       .then(() => {
         expect(requestCount).to.eql(1);
       });
   });
 
-  it("check cache options with rewrite id", function () {
+  it("check cache options with rewrite id", function() {
     let requestCount = 0;
     const rest = reduxApi({
       test: {
@@ -693,10 +705,12 @@ describe("redux", () => {
     });
     const store = storeHelper(rest);
     return store
-      .dispatch(rest.actions.test({
-        id1: 1,
-        id2: 2
-      }))
+      .dispatch(
+        rest.actions.test({
+          id1: 1,
+          id2: 2
+        })
+      )
       .then(() => {
         const state = store.getState();
         expect(state.test.cache).to.eql({
@@ -705,17 +719,19 @@ describe("redux", () => {
             expire: false
           }
         });
-        return store.dispatch(rest.actions.test({
-          id1: 1,
-          id2: 2
-        }));
+        return store.dispatch(
+          rest.actions.test({
+            id1: 1,
+            id2: 2
+          })
+        );
       })
       .then(() => {
         expect(requestCount).to.eql(1);
       });
   });
 
-  it("check cache options with expire=0 request", function () {
+  it("check cache options with expire=0 request", function() {
     let requestCount = 0;
     const rest = reduxApi({
       test: {
@@ -730,26 +746,30 @@ describe("redux", () => {
     });
     const store = storeHelper(rest);
     return store
-      .dispatch(rest.actions.test({
-        id1: 1,
-        id2: 2
-      }))
+      .dispatch(
+        rest.actions.test({
+          id1: 1,
+          id2: 2
+        })
+      )
       .then(() => {
         const state = store.getState();
         const d = state.test.cache["test_id1=1;id2=2;"];
         expect(d).to.exist;
         expect(d.data).to.eql("/api/1/2");
-        return store.dispatch(rest.actions.test({
-          id1: 1,
-          id2: 2
-        }));
+        return store.dispatch(
+          rest.actions.test({
+            id1: 1,
+            id2: 2
+          })
+        );
       })
       .then(() => {
         expect(requestCount).to.eql(2);
       });
   });
 
-  it("check double call crud alias", function () {
+  it("check double call crud alias", function() {
     let fetchCounter = 0;
     const rest = reduxApi({
       test: {
@@ -917,22 +937,28 @@ describe("redux", () => {
 
     return store
       .dispatch(
-        rest.actions.test({
-          id: 1
-        }, {
-          body: "Test",
-          headers: ["JSON"]
-        })
+        rest.actions.test(
+          {
+            id: 1
+          },
+          {
+            body: "Test",
+            headers: ["JSON"]
+          }
+        )
       )
       .then(() => {
         expect(STATE_1).to.eql(store.getState());
         return store.dispatch(
-          rest.actions.test({
-            id: 2
-          }, {
-            body: "Test2",
-            headers: ["XML"]
-          })
+          rest.actions.test(
+            {
+              id: 2
+            },
+            {
+              body: "Test2",
+              headers: ["XML"]
+            }
+          )
         );
       })
       .then(() => {
