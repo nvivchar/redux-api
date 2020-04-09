@@ -172,7 +172,7 @@ export default function actionFn(url, name, options, ACTIONS = {}, meta = {}) {
       const state = getState();
       const isLoading = get(state, meta.prefix, meta.reducerName, "loading");
       if (isLoading) {
-        return Promise.reject("isLoading");
+        return Promise.resolve({});
       }
       const requestOptions = { pathvars, params };
       const prevData = get(state, meta.prefix, meta.reducerName, "data");
